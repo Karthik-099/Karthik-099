@@ -1,4 +1,4 @@
-<h1 align="center">Hi 👋, I'm Karthik</h1>
+<h1 align="center">Hi👋,I'm Karthik</h1>
 <h3 align="center">DevOps & Cloud Innovator | Enthusiastic about AWS, GCP, MLOps</h3>
 
 <p align="left"> <img src="https://komarev.com/ghpvc/?username=karthik-099&label=Profile%20views&color=0e75b6&style=flat" alt="karthik-099" /> </p>
