@@ -31,7 +31,7 @@
   <!-- gmail -->
   <a href="mailto:karthikkpoojar@gmail.com"><img src="https://img.shields.io/badge/-Gmail-%23333?style=for-the-badge&logo=gmail&logoColor=white" target="_blank"></a>
   <!-- linkedin -->
-  <a href="https://www.linkedin.com/in/KARTHIK-9b4211252/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank"></a> 
+  <a href="https://www.linkedin.com/in/%F0%9D%98%92%F0%9D%98%88%F0%9D%98%99%F0%9D%98%9B%F0%9D%98%8F%F0%9D%98%90%F0%9D%98%92-9b4211252/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank"></a> 
 </div>
 
 <hr />
