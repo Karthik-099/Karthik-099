@@ -13,11 +13,25 @@
 
 <div align="center">
 
+```ascii
+    ┌─────────────────────────────────────────────────────────────┐
+    │  SERVER RACK                                    [●][●][●]  │
+    │  ┌───────────────────────────────────────────────────────┐ │
+    │  │ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │ │
+    │  │ ▓ KARTHIK@DEVOPS-SERVER                    [ON] [●] ▓ │ │
+    │  │ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │ │
+    │  └───────────────────────────────────────────────────────┘ │
+    │  [●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●] │
+    └─────────────────────────────────────────────────────────────┘
+         ║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║
+         ╚╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╝
+```
+
 ```console
 root@github:~# whoami
 ```
 
-<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=32&duration=2800&pause=2000&color=00FF41&center=true&vCenter=true&width=940&lines=Karthik+%7C+DevOps+Engineer;Cloud+Architect+%7C+Infrastructure+Automator;Building+Scalable+Systems;Orchestrating+Containers;Automating+Everything" alt="Typing SVG" />
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=32&duration=2800&pause=2000&color=00FF41&center=true&vCenter=true&width=940&lines=DevOps+Engineer+%7C+SysAdmin+%7C+Cloud+Architect;Infrastructure+Automator+%7C+Container+Orchestrator;Building+Scalable+Cloud+Native+Systems;Kubernetes+%7C+Terraform+%7C+CI/CD+Pipelines;Monitoring+%7C+Observability+%7C+GitOps" alt="Typing SVG" />
 
 ```console
 root@github:~# cat /etc/karthik/bio.conf
@@ -93,10 +107,10 @@ root@github:~# cat /proc/skills | grep -E "languages|cloud|devops|iac"
 
 <div align="center">
 
-## SYSTEM METRICS
+## GITHUB ANALYTICS
 
 ```console
-root@github:~# docker stats karthik-099
+root@github:~# cat /var/log/github/stats.log
 ```
 
 <img height="180em" src="https://github-readme-stats.vercel.app/api?username=Karthik-099&show_icons=true&theme=chartreuse-dark&include_all_commits=true&count_private=true&hide_border=true&bg_color=0d1117&title_color=00ff41&icon_color=00ff41&text_color=c9d1d9"/>
@@ -155,19 +169,8 @@ root@github:~# fortune | cowsay
 <div align="center">
 
 ```console
-root@github:~# echo "Thanks for visiting! Let's build something amazing together"
+root@github:~# exit
+Connection to github.com closed.
 ```
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=150&section=footer&text=Happy%20Coding!&fontSize=42&fontColor=fff&animation=twinkling&fontAlignY=72" />
-
-</div>
-
----
-
-<div align="center">
-
-### "In DevOps we trust, in automation we thrive!"
-
-![Snake animation](https://raw.githubusercontent.com/Karthik-099/Karthik-099/output/github-contribution-grid-snake-dark.svg)
 
 </div>
