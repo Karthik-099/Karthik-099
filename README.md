@@ -94,18 +94,6 @@ root@github:~# cat /proc/skills | grep -E "languages|cloud|devops|iac"
 <div align="center">
 
 ```console
-root@github:~# fortune | cowsay
-```
-
-![Quote](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=dark&quote=Automate%20everything%2C%20monitor%20everything%2C%20and%20never%20trust%20production.&author=DevOps%20Philosophy)
-
-</div>
-
----
-
-<div align="center">
-
-```console
 root@github:~# exit
 Connection to github.com closed.
 ```
