@@ -13,20 +13,6 @@
 
 <div align="center">
 
-```ascii
-    ┌─────────────────────────────────────────────────────────────┐
-    │  SERVER RACK                                    [●][●][●]  │
-    │  ┌───────────────────────────────────────────────────────┐ │
-    │  │ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │ │
-    │  │ ▓ KARTHIK@DEVOPS-SERVER                    [ON] [●] ▓ │ │
-    │  │ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │ │
-    │  └───────────────────────────────────────────────────────┘ │
-    │  [●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●] │
-    └─────────────────────────────────────────────────────────────┘
-         ║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║
-         ╚╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╝
-```
-
 ```console
 root@github:~# whoami
 ```
@@ -89,6 +75,20 @@ root@github:~# ls -la /home/karthik/social/
 
 <div align="center">
 
+## DEVOPS INFINITY LOOP
+
+```console
+root@github:~# systemctl status devops-pipeline.service
+```
+
+<img src="https://raw.githubusercontent.com/Platane/snk/output/github-contribution-grid-snake-dark.svg" alt="DevOps Infinity Loop" />
+
+</div>
+
+---
+
+<div align="center">
+
 ## TECH STACK
 
 ```console
@@ -107,13 +107,13 @@ root@github:~# cat /proc/skills | grep -E "languages|cloud|devops|iac"
 
 <div align="center">
 
-## GITHUB ANALYTICS
+## GITHUB STATS
 
 ```console
-root@github:~# cat /var/log/github/stats.log
+root@github:~# git log --stat --author="Karthik-099"
 ```
 
-<img height="180em" src="https://github-readme-stats.vercel.app/api?username=Karthik-099&show_icons=true&theme=chartreuse-dark&include_all_commits=true&count_private=true&hide_border=true&bg_color=0d1117&title_color=00ff41&icon_color=00ff41&text_color=c9d1d9"/>
+<img height="180em" src="https://github-readme-stats.vercel.app/api?username=Karthik-099&show_icons=true&theme=chartreuse-dark&include_all_commits=true&count_private=true&hide_border=true&bg_color=0d1117&title_color=00ff41&icon_color=00ff41&text_color=c9d1d9&rank_icon=github"/>
 <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Karthik-099&layout=compact&langs_count=8&theme=chartreuse-dark&hide_border=true&bg_color=0d1117&title_color=00ff41&text_color=c9d1d9"/>
 
 </div>
