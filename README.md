@@ -75,20 +75,6 @@ root@github:~# ls -la /home/karthik/social/
 
 <div align="center">
 
-## DEVOPS INFINITY LOOP
-
-```console
-root@github:~# systemctl status devops-pipeline.service
-```
-
-<img src="https://raw.githubusercontent.com/Platane/snk/output/github-contribution-grid-snake-dark.svg" alt="DevOps Infinity Loop" />
-
-</div>
-
----
-
-<div align="center">
-
 ## TECH STACK
 
 ```console
@@ -107,60 +93,11 @@ root@github:~# cat /proc/skills | grep -E "languages|cloud|devops|iac"
 
 <div align="center">
 
-## GITHUB STATS
-
-```console
-root@github:~# git log --stat --author="Karthik-099"
-```
-
-<img height="180em" src="https://github-readme-stats.vercel.app/api?username=Karthik-099&show_icons=true&theme=chartreuse-dark&include_all_commits=true&count_private=true&hide_border=true&bg_color=0d1117&title_color=00ff41&icon_color=00ff41&text_color=c9d1d9&rank_icon=github"/>
-<img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Karthik-099&layout=compact&langs_count=8&theme=chartreuse-dark&hide_border=true&bg_color=0d1117&title_color=00ff41&text_color=c9d1d9"/>
-
-</div>
-
----
-
-<div align="center">
-
-## CONTRIBUTION ACTIVITY
-
-```console
-root@github:~# tail -f /var/log/contributions.log
-```
-
-<img src="https://github-readme-streak-stats.herokuapp.com/?user=Karthik-099&theme=chartreuse-dark&hide_border=true&background=0d1117&stroke=00ff41&ring=00ff41&fire=00ff41&currStreakLabel=00ff41" alt="GitHub Streak" />
-
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=Karthik-099&theme=react-dark&bg_color=0d1117&color=00ff41&line=00ff41&point=ffffff&area=true&hide_border=true" alt="Contribution Graph" />
-
-</div>
-
----
-
-<div align="center">
-
-## DEVOPS WISDOM
-
 ```console
 root@github:~# fortune | cowsay
 ```
 
 ![Quote](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=dark&quote=Automate%20everything%2C%20monitor%20everything%2C%20and%20never%20trust%20production.&author=DevOps%20Philosophy)
-
-</div>
-
----
-
-<div align="center">
-
-## CURRENT MISSION
-
-```diff
-+ Building cloud-native applications
-+ Automating infrastructure with IaC
-+ Optimizing CI/CD pipelines
-+ Scaling Kubernetes clusters
-+ Implementing GitOps workflows
-```
 
 </div>
 
