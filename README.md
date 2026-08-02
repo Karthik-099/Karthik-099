@@ -1,5 +1,3 @@
-
-
 <div align="center">
 
 ```console
@@ -72,7 +70,27 @@ root@github:~# cat /proc/skills | grep -E "languages|cloud|devops|iac"
 
 <p align="center">
   <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=python,go,bash,aws,gcp,kubernetes,docker,jenkins,githubactions,terraform,ansible,prometheus,grafana,linux,redhat,ubuntu,postgres,mysql,mongodb,git,vscode&perline=11" />
+    <img src="https://skillicons.dev/icons?i=python&perline=1" />
+  </a>
+</p>
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=bash,aws&perline=2" />
+  </a>
+</p>
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=gcp,kubernetes,docker&perline=3" />
+  </a>
+</p>
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=jenkins,githubactions,terraform,ansible&perline=4" />
+  </a>
+</p>
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=prometheus,grafana,linux,redhat,ubuntu,postgres,mysql,mongodb,git,vscode&perline=10" />
   </a>
 </p>
 
