@@ -47,31 +47,6 @@
 </picture>
 </a>
 
-<h2 align="center">What I bring to a team</h2>
-
-<table align="center" width="100%">
-<tr>
-<td width="33%" valign="top" align="center">
-<h3>I own production,<br>not just pipelines</h3>
-<p align="left">Production-readiness owner for <b>6 products on AKS</b> at <a href="https://incruiter.com">InCruiter</a>. I tune the alerts, get paged, and write the RCA after. Tightening Datadog dashboards and alert routing cut <b>time to detect by 40%</b>.</p>
-</td>
-<td width="33%" valign="top" align="center">
-<h3>I make the cloud bill<br>smaller, safely</h3>
-<p align="left">Moved a Kubernetes cluster across Azure subscriptions onto spot capacity, right-sized with CAST AI and Kubecost: <b>−50% infra cost</b>. Non-prod clusters now sleep on a schedule: <b>−60% compute</b>, nobody touches it.</p>
-</td>
-<td width="33%" valign="top" align="center">
-<h3>I run the GPUs<br>AI teams depend on</h3>
-<p align="left">Kept an 8-node bare-metal <b>H200 + MI300X</b> Slurm cluster at <b>98% availability</b> for 70 researchers at IISc. Today I serve and fine-tune <b>Nemotron Nano 8B</b> and <b>Magpie TTS</b> on EC2 GPUs, traced with Langfuse.</p>
-</td>
-</tr>
-</table>
-
-<p align="center">
-<b>Looking for:</b> DevOps Engineer · Site Reliability Engineer · Platform Engineer · ML Infrastructure<br>
-<b>Based in:</b> Bangalore, India (IST) · remote or onsite · comfortable overlapping with EU and US teams<br>
-<a href="mailto:karthikkpoojar@gmail.com?subject=Hello%20Karthik"><b>karthikkpoojar@gmail.com</b></a> · <a href="https://karthik-portfolioo.netlify.app">portfolio and resume</a>
-</p>
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/divider-dark.svg">
   <img alt="" src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/divider-light.svg" width="100%">
@@ -106,7 +81,7 @@ I'm a DevOps engineer who likes **boring production**: clusters that heal themse
 </tr>
 </table>
 
-<h2 align="center">How I ship: enterprise GitOps delivery with self-healing releases</h2>
+<h2 align="center">How I ship</h2>
 
 <a href="https://github.com/Karthik-099/Self-Healing-DevSecOps-Pipeline-for-a-Transaction-Risk-Scoring-Microservice">
 <picture>
@@ -114,15 +89,6 @@ I'm a DevOps engineer who likes **boring production**: clusters that heal themse
   <img alt="Enterprise GitOps delivery pipeline. CI: commit, Gitleaks secret scan, unit tests, SonarQube quality gate, Trivy dependency scan and SBOM, Terraform and Kyverno policy as code, Docker build. Release: Trivy image scan, cosign signing and push to Docker Hub, ECR or ACR, config repo bumped to the image digest, Argo CD pull-based sync, Kyverno admission, Argo Rollouts canary, production on AKS, EKS, GKE or DOKS. Verify: Prometheus, Loki and Tempo feed an SLO analysis that promotes the release or rolls it back automatically, pages PagerDuty and reverts the config repo." src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/pipeline-light.svg" width="100%">
 </picture>
 </a>
-
-<h2 align="center">How I see production: multi-cloud observability that closes the loop</h2>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/observability-dark.svg">
-  <img alt="Multi-cloud observability and self-healing. Grafana Alloy on AKS, EKS, GKE, DOKS and LiveKit media nodes ships metrics, logs, traces and security events through private endpoints into a hub VNet: an Alloy gateway feeds Mimir, Loki and Tempo, backed by object storage and PVC write-ahead logs. Grafana SLO burn-rate alerts route through a NAT gateway to PagerDuty and Slack, and self-healing actions (rollback, autoscaling, restarts) close the loop back to the workloads." src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/observability-light.svg" width="100%">
-</picture>
-
-<p align="center"><sub>The pattern behind the stack I run at work: one Alloy agent per cluster, one place to look, SLO-driven paging, and a <b>35% gain in collection efficiency</b>.</sub></p>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/divider-dark.svg">
@@ -157,16 +123,8 @@ I'm a DevOps engineer who likes **boring production**: clusters that heal themse
 | [A comprehensive review on scaling machine learning workflows using cloud technologies and DevOps](https://ieeexplore.ieee.org/abstract/document/11126113) | **IEEE Access (Q1)** · 2025 |
 | [AI-Driven DevOps for intelligent automation in continuous software delivery pipelines](https://ieeexplore.ieee.org/abstract/document/11382867) | IEEE ICECMSN · 2026 |
 | [Secure communication protocols for multimedia things in IoMT](https://www.sciencedirect.com/science/chapter/edited-volume/abs/pii/B9780443328848000106) | Elsevier book chapter · 2026 |
-
-<details>
-<summary><b>Two more papers</b></summary>
-
-<br>
-
-- [Scalable machine learning solutions for solar energy output forecasting and PV performance improvement](https://ieeexplore.ieee.org/abstract/document/11382828), IEEE ICECMSN 2026
-- [Inorganic chemical reaction predictor using Random Forest and SVM](https://ieeexplore.ieee.org/abstract/document/10986863), IEEE AIDE 2025
-
-</details>
+| [Scalable machine learning solutions for solar energy output forecasting and PV performance improvement](https://ieeexplore.ieee.org/abstract/document/11382828) | IEEE ICECMSN · 2026 |
+| [Inorganic chemical reaction predictor using Random Forest and SVM](https://ieeexplore.ieee.org/abstract/document/10986863) | IEEE AIDE · 2025 |
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/divider-dark.svg">
@@ -216,21 +174,10 @@ I'm a DevOps engineer who likes **boring production**: clusters that heal themse
 <img src="https://img.shields.io/badge/ClickHouse-FFCC01?style=for-the-badge&logo=clickhouse&logoColor=black" alt="ClickHouse"/>
 </div>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/divider-dark.svg">
-  <img alt="" src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/divider-light.svg" width="100%">
-</picture>
-
-<!-- Terminal -->
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/terminal-dark.svg">
-  <img alt="karthik@prod neofetch: DevOps Engineer at InCruiter; Azure, AWS, GCP; AKS, EKS, bare metal; Terraform, Ansible, Helm; Argo CD; LGTM, Datadog, OpenTelemetry; H200, MI300X, Slurm." src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/terminal-light.svg" width="100%">
-</picture>
-
 <!-- Footer -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/footer-dark.svg">
   <img alt="" src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/footer-light.svg" width="100%">
 </picture>
 
-<p align="center"><b>Need production that stays up and costs less? <a href="mailto:karthikkpoojar@gmail.com?subject=Hello%20Karthik">Let's talk.</a></b></p>
+<p align="center"><b>Need production that stays up and costs less? <a href="https://karthik-portfolioo.netlify.app">Let's talk.</a></b></p>
