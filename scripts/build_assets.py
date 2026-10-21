@@ -8,6 +8,8 @@ prefers-reduced-motion, so it renders the same through GitHub's image proxy.
 from pathlib import Path
 from xml.sax.saxutils import escape
 
+from icons import AZURE, ICONS
+
 OUT = Path(__file__).resolve().parent.parent / "assets"
 
 THEMES = {
@@ -234,107 +236,455 @@ def canary(t):
     return svg(W, H, "".join(b), t, label="Animated Argo Rollouts canary: traffic shifts 10%, 50%, 100% to the new version while error rate stays under the SLO, then the release is promoted.")
 
 
+# ───────────────────────────── shared 3D helpers ─────────────────────────────
+# Brand colours; a second value is used on dark backgrounds where the brand colour is too dark.
+BRAND = {
+    "github": ("#1f2328", "#e6edf3"), "pytest": ("#0a9edc",), "sonarqube": ("#4e9bcd",), "trivy": ("#1904da", "#6c8cff"),
+    "terraform": ("#7b42bc", "#a97ff0"), "docker": ("#2496ed",), "argo": ("#ef7b4d",), "kubernetes": ("#326ce5", "#6b95f2"),
+    "prometheus": ("#e6522c",), "grafana": ("#f46800",), "pagerduty": ("#06ac38",), "gcp": ("#4285f4",),
+    "digitalocean": ("#0080ff",), "aws": ("#ff9900",), "opentelemetry": ("#f5a800",), "helm": ("#0f1689", "#7c8cff"),
+    "git": ("#f05032",), "slack": ("#4a154b", "#e8a6e9"), "githubactions": ("#2088ff",),
+}
+# Hand-drawn glyphs (24 grid) for tools without a public mark.
+GLYPHS = {
+    "key": "M7 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0-2a5 5 0 0 1 4.9 4H22v2h-2v3h-3v-3h-5.1A5 5 0 1 1 7 7z",
+    "shield": "M12 1.5 3.5 4.8v6.4c0 5.2 3.6 10 8.5 11.3 4.9-1.3 8.5-6.1 8.5-11.3V4.8L12 1.5zm-1.3 14.9-4-4 1.5-1.5 2.5 2.5 5.6-5.6 1.5 1.5-7.1 7.1z",
+    "bell": "M12 22a2.5 2.5 0 0 0 2.4-2h-4.8a2.5 2.5 0 0 0 2.4 2zm7-6v-5a7 7 0 0 0-5.5-6.8V3a1.5 1.5 0 0 0-3 0v1.2A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z",
+    "heal": "M12 4V1L7.5 5.5 12 10V6.5a5.5 5.5 0 1 1-5.5 5.5H4a8 8 0 1 0 8-8z",
+    "wave": "M2 10h2.5v4H2zm4.5-3H9v10H6.5zM11 3.5h2.5v17H11zM15.5 7H18v10h-2.5zm4.5 3h2.5v4H20z",
+    "nat": "M4 7h11l-3-3 1.4-1.4L19 8.2l-5.6 5.6L12 12.4l3-3H4V7zm16 10H9l3 3-1.4 1.4L5 15.8l5.6-5.6 1.4 1.4-3 3h11v2z",
+    "gauge": "M3 20h18v1.5H3zM5 13h3v6H5zm5-5h3v11h-3zm5 3h3v8h-3z",
+    "check": "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.5 14.6-4.3-4.3 1.6-1.6 2.7 2.7 5.9-5.9 1.6 1.6-7.5 7.5z",
+    "rewind": "M11 18V6l-8.5 6 8.5 6zm.5-6 8.5 6V6l-8.5 6z",
+    "seal": "M12 1 9.4 3.3 6 2.9l-.9 3.3L2 7.9l1.2 3.2L2 14.3l3.1 1.7.9 3.3 3.4-.4L12 21.2l2.6-2.3 3.4.4.9-3.3 3.1-1.7-1.2-3.2L22 7.9l-3.1-1.7-.9-3.3-3.4.4L12 1zm-1.4 14.4-3.8-3.8 1.4-1.4 2.4 2.4 5.1-5.1 1.4 1.4-6.5 6.5z",
+    "vault": "M3 4h18v16H3V4zm2 2v12h14V6H5zm7 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7zm0 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z",
+}
+
+
+def logo(name, x, y, s, t, color=None):
+    """A brand mark or glyph as a nested <svg>; nothing external, so GitHub's proxy renders it."""
+    if name == "azure":
+        d0, d1, d2 = AZURE
+        return (f'<svg x="{x}" y="{y}" width="{s}" height="{s}" viewBox="20 26 216 204"><path fill="#0a4f9e" d="{d0}"/>'
+                f'<path fill="#0078d4" d="{d1}"/><path fill="#36b4ec" d="{d2}"/></svg>')
+    dark = t is THEMES["dark"]
+    if color is None:
+        c = BRAND.get(name, (t["text"],))
+        color = c[-1] if dark else c[0]
+    d = ICONS.get(name) or GLYPHS[name]
+    return (f'<svg x="{x}" y="{y}" width="{s}" height="{s}" viewBox="0 0 24 24">'
+            f'<path fill="{color}" fill-rule="evenodd" d="{d}"/></svg>')
+
+
+def defs3d(t):
+    """Shared gradients, shadow and the perspective floor every 3D card sits on."""
+    return (f'<defs><linearGradient id="face" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{t["card2"]}"/>'
+            f'<stop offset="1" stop-color="{t["card"]}"/></linearGradient>'
+            f'<filter id="sh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="6" '
+            f'flood-color="#000" flood-opacity="{.45 if t is THEMES["dark"] else .12}"/></filter>'
+            f'<filter id="gl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>'
+            f'<linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/>'
+            f'<stop offset=".35" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".25"/></linearGradient>'
+            f'<mask id="fm"><rect width="100%" height="100%" fill="url(#fade)"/></mask></defs>')
+
+
+def floor(W, H, t):
+    """Receding grid: lines converge on a vanishing point above the card, rows get closer towards the horizon."""
+    vx, vy = W / 2, -H * 1.1
+    g = []
+    for k in range(-14, 15):
+        bx = W / 2 + k * 110
+        g.append(f'<line x1="{vx}" y1="{vy}" x2="{bx}" y2="{H}"/>')
+    y = H
+    step = 46
+    while y > 40 and step > 6:
+        g.append(f'<line x1="0" y1="{y:.1f}" x2="{W}" y2="{y:.1f}"/>')
+        y -= step
+        step *= .92
+    return (f'<g mask="url(#fm)" stroke="{t["grid"]}" stroke-width="1" opacity=".9">'
+            f'<clipPath id="cc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="16"/></clipPath>'
+            f'<g clip-path="url(#cc)">{"".join(g)}</g></g>')
+
+
+def prism(x, y, w, h, col, t, d=10):
+    """Front-facing box extruded up and to the right (cabinet projection)."""
+    return (f'<g filter="url(#sh)">'
+            f'<polygon points="{x},{y} {x + d},{y - d} {x + w + d},{y - d} {x + w},{y}" fill="{col}" fill-opacity=".38"/>'
+            f'<polygon points="{x + w},{y} {x + w + d},{y - d} {x + w + d},{y + h - d} {x + w},{y + h}" fill="{col}" fill-opacity=".62"/>'
+            f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="url(#face)" stroke="{t["border"]}"/></g>'
+            f'<rect x="{x}" y="{y}" width="3" height="{h}" fill="{col}"/>')
+
+
+def pulses(times, period, width=1.0):
+    """keyTimes/values that flash 0→1→0 at each time (seconds) within a repeating period."""
+    kt, vals = [0.0], [0]
+    for s in sorted(times):
+        for dt, v in ((0, 0), (.15, 1), (width, 0)):
+            p = min((s + dt) / period, 1)
+            if p > kt[-1]:
+                kt.append(p)
+                vals.append(v)
+    if kt[-1] < 1:
+        kt.append(1)
+        vals.append(0)
+    return ";".join(f"{k:.4f}" for k in kt), ";".join(map(str, vals))
+
+
+def glow(x, y, w, h, col, times, period):
+    kt, vals = pulses(times, period)
+    return (f'<rect x="{x - 2}" y="{y - 2}" width="{w + 4}" height="{h + 4}" rx="3" fill="none" stroke="{col}" stroke-width="2.5" opacity="0">'
+            f'<animate attributeName="opacity" dur="{period}s" repeatCount="indefinite" keyTimes="{kt}" values="{vals}"/></rect>')
+
+
+class Track:
+    """A path built from straight runs and quarter turns, with its length known so stages can sync to a moving packet."""
+
+    def __init__(self, x, y):
+        self.d, self.x, self.y, self.len, self.marks = [f"M{x},{y}"], x, y, 0.0, {}
+
+    def h(self, x):
+        self.len += abs(x - self.x)
+        self.d.append(f"H{x}")
+        self.x = x
+        return self
+
+    def v(self, y):
+        self.len += abs(y - self.y)
+        self.d.append(f"V{y}")
+        self.y = y
+        return self
+
+    def turn(self, dx, dy):
+        """Quarter circle of radius |dx| (= |dy|) ending dx, dy away."""
+        sweep = 1 if (dx > 0) == (dy > 0) else 0
+        sweep = sweep if self.d[-1].startswith("H") else 1 - sweep
+        self.d.append(f"a{abs(dx)},{abs(dy)} 0 0 {sweep} {dx},{dy}")
+        self.x += dx
+        self.y += dy
+        self.len += 1.5708 * abs(dx)
+        return self
+
+    def at(self, name):
+        self.marks[name] = self.len
+        return self
+
+    def path(self):
+        return " ".join(self.d)
+
+
+def stage_card(x, y, w, h, num, name, tool, icon, col, t):
+    out = [prism(x, y, w, h, col, t),
+           f'<text x="{x + 12}" y="{y + 20}" class="mono mu" font-size="10">{num}</text>',
+           logo(icon, x + w - 30, y + 8, 20, t),
+           f'<text x="{x + 12}" y="{y + 46}" class="sans tx" font-size="13.5" font-weight="700">{escape(name)}</text>']
+    for k, line in enumerate(tool.split("\n")):
+        out.append(f'<text x="{x + 12}" y="{y + 65 + k * 14}" class="mono mu" font-size="10.5">{escape(line)}</text>')
+    return "".join(out)
+
+
 # ───────────────────────────── delivery pipeline ─────────────────────────────
 def pipeline(t):
-    W, H = 1200, 300
-    stages = [("commit", "git push", t["muted"]), ("test", "pytest · SonarQube", t["blue"]),
-              ("scan", "Trivy CVE gate", t["warn"]), ("build", "multi-stage image", t["blue"]),
-              ("deploy", "Argo CD · canary", t["accent2"]), ("observe", "Prom · Loki · Tempo", t["accent"]),
-              ("live", "promoted", t["ok"])]
-    bw, gap, x0, y0, bh = 142, 26, 26, 92, 74
-    b = [f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="16" class="card"/>',
-         f'<text x="28" y="40" class="mono mu" font-size="13">pipeline / <tspan class="tx">self-healing-delivery</tspan></text>',
-         f'<text x="{W - 28}" y="40" text-anchor="end" class="mono mu" font-size="12">every commit: gated, scanned, canaried, watched</text>']
-    cy = y0 + bh / 2
-    main = f"M{x0},{cy} H{x0 + 7 * bw + 6 * gap}"
-    b.append(f'<path d="{main}" stroke="{t["border"]}" stroke-width="2"/>')
-    for i, (name, tool, col) in enumerate(stages):
-        x = x0 + i * (bw + gap)
-        b.append(f'<g class="rise" style="animation-delay:{.1 + i * .12:.2f}s">'
-                 f'<rect x="{x}" y="{y0}" width="{bw}" height="{bh}" rx="12" class="card2"/>'
-                 f'<rect x="{x}" y="{y0}" width="4" height="{bh}" rx="2" fill="{col}"/>'
-                 f'<text x="{x + bw / 2 + 2}" y="{y0 + 32}" text-anchor="middle" class="sans tx" font-size="16" font-weight="700">{name}</text>'
-                 f'<text x="{x + bw / 2 + 2}" y="{y0 + 54}" text-anchor="middle" class="mono mu" font-size="10.5">{escape(tool)}</text></g>')
-        if i < 6:
-            ax = x + bw + gap / 2
-            b.append(f'<path d="M{ax - 4},{cy - 5} l6,5 l-6,5" fill="none" stroke="{t["muted"]}" stroke-width="1.6"/>')
-    for k in range(3):
-        b.append(f'<circle r="5" class="ac"><animateMotion dur="6s" begin="{k * 2}s" repeatCount="indefinite" path="{main}"/>'
-                 f'<animate attributeName="opacity" dur="6s" begin="{k * 2}s" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;.05;.92;1"/></circle>')
-    # rollback arc from observe back to deploy
-    ox = x0 + 5 * (bw + gap) + bw / 2
-    dx = x0 + 4 * (bw + gap) + bw / 2
-    arc = f"M{ox},{y0 + bh} C{ox},{y0 + bh + 70} {dx},{y0 + bh + 70} {dx},{y0 + bh + 4}"
-    b.append(f'<path d="{arc}" fill="none" stroke="{t["warn"]}" stroke-width="2" class="flow"/>')
-    b.append(f'<path d="M{dx - 5},{y0 + bh + 12} l5,-8 l5,8" fill="none" stroke="{t["warn"]}" stroke-width="2"/>')
-    b.append(f'<circle r="5" class="wn"><animateMotion dur="4s" repeatCount="indefinite" path="{arc}"/></circle>')
-    b.append(f'<text x="{(ox + dx) / 2}" y="{y0 + bh + 82}" text-anchor="middle" class="mono wn" font-size="12">SLO breach → automatic rollback</text>')
-    # gate legend
+    W, H = 1200, 660
+    P = 24.0            # one animation period = two releases: one promoted, one rolled back
+    RUN = 8.5           # seconds for a commit to travel from PR to analysis
+    SEC, BLD, OPS, OBS, PRD = t["warn"], t["blue"], t["accent2"], t["accent"], t["ok"]
+    w, gap, x0, h = 134, 26, 46, 92
+    ys = [128, 300, 482]
+    slot = lambda i: x0 + i * (w + gap)
+    rows = [
+        [("Commit", "pull request\nbranch protection", "github", BLD),
+         ("Secret scan", "Gitleaks\nno creds in git", "key", SEC),
+         ("Unit tests", "pytest · Jest\ncoverage gate", "pytest", BLD),
+         ("Code quality", "SonarQube\nquality gate", "sonarqube", SEC),
+         ("Dependencies", "Trivy SCA\nSBOM · licences", "trivy", SEC),
+         ("Policy as code", "Terraform plan\nKyverno CLI", "terraform", SEC),
+         ("Docker build", "multi-stage\ndistroless base", "docker", BLD)],
+        [("Image scan", "Trivy image\nfail on HIGH/CRIT", "trivy", SEC),
+         ("Sign + push", "cosign signature\nDockerHub/ECR/ACR", "seal", BLD),
+         ("Config repo", "Helm values bump\npin image digest", "git", OPS),
+         ("Argo CD sync", "pull-based GitOps\ndrift auto-heal", "argo", OPS),
+         ("Admission", "Kyverno: signed,\nnon-root, limits", "shield", SEC),
+         ("Canary", "Argo Rollouts\n10 → 50 → 100%", "argo", OPS),
+         ("Production", "AKS · EKS · GKE\nDOKS · Key Vault", "kubernetes", PRD)],
+        [("Observe", "Prometheus · Loki\nTempo · Grafana", "prometheus", OBS),
+         ("SLO analysis", "AnalysisRun\nerror rate · p99", "gauge", OBS)],
+    ]
+    b = [defs3d(t), f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="16" class="card"/>', floor(W, H, t),
+         f'<text x="28" y="40" class="mono mu" font-size="13">pipeline / <tspan class="tx">enterprise-gitops-delivery</tspan></text>',
+         f'<text x="{W - 28}" y="40" text-anchor="end" class="mono mu" font-size="12">shift-left security · immutable digests · pull-based deploys · self-healing</text>']
+    lanes = [("01", "CONTINUOUS INTEGRATION", "every pull request is gated before it can merge"),
+             ("02", "RELEASE + GITOPS DELIVERY", "Git is the source of truth; the cluster pulls, nothing pushes in"),
+             ("03", "VERIFY + SELF-HEAL", "")]
+    for (n, title, sub), y in zip(lanes, ys):
+        b.append(f'<text x="{x0}" y="{y - 26}" class="mono" font-size="11" letter-spacing="1.2">'
+                 f'<tspan class="ac" font-weight="700">{n}</tspan><tspan class="tx" font-weight="700">  {title}</tspan>'
+                 f'<tspan class="mu" letter-spacing="0">{"   " + sub if sub else ""}</tspan></text>')
+
+    # conveyor track under each row; row 2 runs right-to-left (snake)
+    r = 16
+    rail = [y + h + 18 for y in ys]
+    tr = Track(x0 - 16, rail[0])
+    marks = []
+    xs_r0 = [slot(i) + w / 2 for i in range(7)]
+    tr.h(x0)
+    for cx in xs_r0:
+        tr.h(cx).at(len(marks))
+        marks.append(None)
+    tr.h(W - 34 - r).turn(r, r).v(rail[1] - r).turn(-r, r)
+    for i in range(6, -1, -1):
+        tr.h(slot(i) + w / 2).at(len(marks))
+        marks.append(None)
+    tr.h(30).turn(-r, r).v(rail[2] - r).turn(r, r)
+    for i in range(2):
+        tr.h(slot(i) + w / 2).at(len(marks))
+        marks.append(None)
+    tr.h(slot(1) + w + 30)
+    main = tr.path()
+    L = tr.len
+    fork_x, fork_y = tr.x, tr.y
+
+    b.append(f'<path d="{main}" fill="none" stroke="{t["border"]}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>')
+    b.append(f'<path d="{main}" fill="none" stroke="{t["muted"]}" stroke-opacity=".55" stroke-width="1.5" class="flow"/>')
+
+    # stage cards, each lights up as the packet passes underneath it
+    order = [(0, i) for i in range(7)] + [(1, i) for i in range(6, -1, -1)] + [(2, i) for i in range(2)]
+    num = 0
+    pos = {}
+    for k, (row, i) in enumerate(order):
+        name, tool, icon, col = rows[row][i if row != 1 else 6 - i]
+        x, y = slot(i), ys[row]
+        pos[name] = (x, y)
+        num += 1
+        b.append(stage_card(x, y, w, h, f"{num:02d}", name, tool, icon, col, t))
+        f = tr.marks[k] / L
+        b.append(glow(x, y, w, h, col, [f * RUN, P / 2 + f * RUN], P))
+        b.append(f'<line x1="{x + w / 2}" y1="{y + h}" x2="{x + w / 2}" y2="{rail[row] - 3}" stroke="{t["border"]}" stroke-width="2"/>')
+
+    # the release packet: runs the whole track twice per period
+    e = .001
+    kp = "0;1;1;0;1;1"
+    kt = f"0;{RUN / P:.4f};{.5 - e:.4f};.5;{.5 + RUN / P:.4f};1"
+    vis_kt = f"0;.005;{RUN / P:.4f};{RUN / P + .02:.4f};.5;.505;{.5 + RUN / P:.4f};{.5 + RUN / P + .02:.4f};1"
+    for rr, op in ((11, .25), (6, 1)):
+        b.append(f'<circle r="{rr}" class="ac" opacity="0"{" filter=" + chr(34) + "url(#gl)" + chr(34) if rr > 6 else ""}>'
+                 f'<animateMotion dur="{P}s" repeatCount="indefinite" path="{main}" keyPoints="{kp}" keyTimes="{kt}" calcMode="linear"/>'
+                 f'<animate attributeName="opacity" dur="{P}s" repeatCount="indefinite" keyTimes="{vis_kt}" values="0;{op};{op};0;0;{op};{op};0;0"/></circle>')
+
+    # decision fork: first release is promoted, second breaches the SLO and is reverted
+    ox, ow, oh = fork_x + 40, 214, 58
+    py_, ry_ = ys[2] - 14, ys[2] + 66
+    outs = [("Promote", "100% traffic · release done", "check", PRD, py_),
+            ("Auto-rollback", "abort · page PagerDuty · RCA", "rewind", t["err"], ry_)]
+    branch = {}
+    for name, sub, icon, col, oy in outs:
+        b.append(prism(ox, oy, ow, oh, col, t))
+        b.append(logo(icon, ox + 12, oy + 10, 18, t, col))
+        b.append(f'<text x="{ox + 38}" y="{oy + 24}" class="sans tx" font-size="13.5" font-weight="700">{name}</text>')
+        b.append(f'<text x="{ox + 12}" y="{oy + 46}" class="mono mu" font-size="10.5">{sub}</text>')
+        p = f"M{fork_x},{fork_y} C{fork_x + 24},{fork_y} {ox - 26},{oy + oh / 2} {ox},{oy + oh / 2}"
+        branch[name] = p
+        b.append(f'<path d="{p}" fill="none" stroke="{col}" stroke-opacity=".5" stroke-width="2" class="flow"/>')
+    logo_pd = logo("pagerduty", ox + ow - 28, ry_ + 10, 16, t)
+    b.append(logo_pd)
+    b.append(f'<text x="{fork_x - 6}" y="{fork_y - 10}" text-anchor="end" class="mono mu" font-size="10">SLO met?</text>')
+    for name, start, col, oy in (("Promote", RUN, PRD, py_), ("Auto-rollback", P / 2 + RUN, t["err"], ry_)):
+        kt2 = f"0;{start / P:.4f};{(start + 1.2) / P:.4f};1"
+        b.append(f'<circle r="5.5" fill="{col}" opacity="0"><animateMotion dur="{P}s" repeatCount="indefinite" path="{branch[name]}" '
+                 f'keyPoints="0;0;1;1" keyTimes="{kt2}" calcMode="linear"/>'
+                 f'<animate attributeName="opacity" dur="{P}s" repeatCount="indefinite" keyTimes="0;{start / P:.4f};{(start + 1.2) / P:.4f};{(start + 1.25) / P:.4f};1" values="0;0;1;0;0"/></circle>')
+        b.append(glow(ox, oy, ow, oh, col, [start + 1.1], P))
+
+    # self-heal: rollback reverts the config repo to the last good digest, Argo CD re-syncs
+    cx_, cy_ = pos["Config repo"]
+    rb = f"M{ox + ow + 10},{ry_ + oh / 2} C{ox + ow + 120},{ry_ + oh / 2} {cx_ + w / 2},{rail[1] + 120} {cx_ + w / 2},{rail[1] + 8}"
+    b.append(f'<path d="{rb}" fill="none" stroke="{t["err"]}" stroke-width="2" stroke-dasharray="6 6" class="flow"/>')
+    b.append(f'<path d="M{cx_ + w / 2 - 6},{rail[1] + 18} l6,-9 l6,9" fill="none" stroke="{t["err"]}" stroke-width="2"/>')
+    s0 = P / 2 + RUN + 1.3
+    b.append(f'<circle r="5.5" fill="{t["err"]}" opacity="0"><animateMotion dur="{P}s" repeatCount="indefinite" path="{rb}" '
+             f'keyPoints="0;0;1;1" keyTimes="0;{s0 / P:.4f};{(s0 + 1.6) / P:.4f};1" calcMode="linear"/>'
+             f'<animate attributeName="opacity" dur="{P}s" repeatCount="indefinite" keyTimes="0;{s0 / P:.4f};{(s0 + 1.6) / P:.4f};{(s0 + 1.65) / P:.4f};1" values="0;0;1;0;0"/></circle>')
+    b.append(glow(cx_, cy_, w, h, t["err"], [s0 + 1.5], P))
+    b.append(f'<text x="{cx_ + w / 2 - 12}" y="{rail[1] + 30}" text-anchor="end" class="mono er" font-size="10.5">git revert → last good digest</text>')
+
+    # deploy targets
+    tx0, ty0 = 860, ys[2] - 14
+    b.append(f'<text x="{tx0}" y="{ty0 - 12}" class="mono mu" font-size="10.5" letter-spacing="1">SAME PIPELINE, ANY CLUSTER</text>')
+    targets = [("aws", "EKS"), ("azure", "AKS"), ("gcp", "GKE"), ("digitalocean", "DOKS"), ("wave", "LiveKit")]
+    for k, (ic, lbl) in enumerate(targets):
+        x = tx0 + k * 60
+        b.append(prism(x, ty0, 50, 58, t["border"], t, 6))
+        b.append(logo(ic, x + 12, ty0 + 8, 26, t, t["accent"] if ic == "wave" else None))
+        b.append(f'<text x="{x + 25}" y="{ty0 + 50}" text-anchor="middle" class="mono tx" font-size="10">{lbl}</text>')
+    b.append(f'<text x="{tx0}" y="{ty0 + 86}" class="mono mu" font-size="10.5">Terraform modules · Helm · one Argo CD</text>')
+    b.append(f'<text x="{tx0}" y="{ty0 + 102}" class="mono mu" font-size="10.5">ApplicationSet per environment</text>')
+
+    # legend
     lx = 28
-    for lbl, col in [("security gates on every commit", t["warn"]), ("canary traffic shifting", t["accent2"]),
-                     ("metrics · logs · traces", t["accent"])]:
-        b.append(f'<circle cx="{lx + 5}" cy="{H - 30}" r="4" fill="{col}"/><text x="{lx + 16}" y="{H - 26}" class="mono mu" font-size="11.5">{lbl}</text>')
-        lx += len(lbl) * 7.2 + 44
-    return svg(W, H, "".join(b), t, label="Self-healing delivery pipeline: commit, test with SonarQube, Trivy scan, build, Argo CD canary deploy, observe with Prometheus, Loki and Tempo, then promote; an SLO breach triggers automatic rollback.")
+    for lbl, col in [("security gate", SEC), ("build + release", BLD), ("GitOps (pull)", OPS),
+                     ("observe", OBS), ("live", PRD), ("self-heal path", t["err"])]:
+        b.append(f'<rect x="{lx}" y="{H - 34}" width="10" height="10" rx="2" fill="{col}"/>'
+                 f'<text x="{lx + 16}" y="{H - 25}" class="mono mu" font-size="11">{lbl}</text>')
+        lx += len(lbl) * 6.8 + 42
+    b.append(f'<text x="{W - 28}" y="{H - 25}" text-anchor="end" class="mono mu" font-size="11">no kubectl from CI · no long-lived cloud keys (OIDC)</text>')
+    return svg(W, H, "".join(b), t, label=PIPELINE_ALT)
+
+
+PIPELINE_ALT = ("Enterprise GitOps delivery pipeline. CI: commit, Gitleaks secret scan, unit tests, SonarQube quality gate, "
+                "Trivy dependency scan and SBOM, Terraform and Kyverno policy as code, Docker build. Release: Trivy image scan, "
+                "cosign signing and push to Docker Hub, ECR or ACR, config repo bumped to the image digest, Argo CD pull-based sync, "
+                "Kyverno admission, Argo Rollouts canary, production on AKS, EKS, GKE or DOKS. Verify: Prometheus, Loki and Tempo feed "
+                "an SLO analysis that promotes the release or rolls it back automatically, pages PagerDuty and reverts the config repo.")
 
 
 # ───────────────────────────── observability architecture ─────────────────────────────
+def slab(cx, cy, a, bb, hh, col, t, title="", sub="", icon=None):
+    """Isometric slab; title and subtitle are painted onto the top face."""
+    top = f"{cx},{cy - bb} {cx + a},{cy} {cx},{cy + bb} {cx - a},{cy}"
+    left = f"{cx - a},{cy} {cx},{cy + bb} {cx},{cy + bb + hh} {cx - a},{cy + hh}"
+    right = f"{cx},{cy + bb} {cx + a},{cy} {cx + a},{cy + hh} {cx},{cy + bb + hh}"
+    out = [f'<g filter="url(#sh)"><polygon points="{left}" fill="{col}" fill-opacity=".55"/>'
+           f'<polygon points="{right}" fill="{col}" fill-opacity=".8"/>'
+           f'<polygon points="{top}" fill="{t["card2"]}"/><polygon points="{top}" fill="{col}" fill-opacity=".14" stroke="{col}" stroke-opacity=".7"/></g>']
+    # map the top face to a flat square of side s: local x runs down-right, local y down-left
+    s = bb * 2
+    sx = a / s
+    m = f"matrix({sx:.4f} {.5:.4f} {-sx:.4f} {.5:.4f} {cx} {cy})"
+    if icon:
+        out.append(f'<g transform="{m}">{logo(icon, -s / 2 + 8, -s / 2 + 8, s * .2, t, col)}</g>')
+    if title:
+        out.append(f'<g transform="{m}"><text x="{-s / 2 + 8}" y="{s * .12:.1f}" class="sans" font-size="{min(s * .17, 22):.1f}" font-weight="800" fill="{col}">{title}</text>'
+                   f'<text x="{-s / 2 + 8}" y="{s * .27:.1f}" class="mono tx" font-size="{s * .085:.1f}">{escape(sub)}</text></g>')
+    return "".join(out)
+
+
 def observability(t):
-    W, H = 1200, 430
-    b = [f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="16" class="card"/>',
-         f'<text x="28" y="40" class="mono mu" font-size="13">architecture / <tspan class="tx">hub-and-spoke-observability</tspan></text>']
-    sig = [("metrics", t["accent"]), ("logs", t["warn"]), ("traces", t["accent2"])]
-    # spokes
-    spokes = ["prod", "staging", "dev"]
-    hub_x, hub_y, hub_w, hub_h = 470, 80, 300, 270
-    for i, s in enumerate(spokes):
-        y = 80 + i * 96
-        b.append(f'<rect x="28" y="{y}" width="250" height="78" rx="12" class="card2"/>')
-        b.append(f'<text x="46" y="{y + 28}" class="sans tx" font-size="15" font-weight="700">AKS · {s}</text>')
-        c, _ = chip(46, y + 40, "Grafana Alloy", t, t["accent"], 11)
-        b.append(c)
-        for k in range(3):
-            b.append(f'<circle cx="{246 + k * 0}" cy="{y + 26 + k * 13}" r="3" fill="{sig[k][1]}"/>')
-        path = f"M278,{y + 39} C370,{y + 39} 380,{hub_y + 135} {hub_x},{hub_y + 135}"
-        b.append(f'<path d="{path}" fill="none" stroke="{t["border"]}" stroke-width="1.5"/>')
-        for k, (_, col) in enumerate(sig):
-            b.append(f'<circle r="3.5" fill="{col}"><animateMotion dur="2.7s" begin="{i * .4 + k * .9:.1f}s" repeatCount="indefinite" path="{path}"/></circle>')
-    # hub
-    b.append(f'<rect x="{hub_x}" y="{hub_y}" width="{hub_w}" height="{hub_h}" rx="14" class="card2" stroke-dasharray="5 4"/>')
-    b.append(f'<text x="{hub_x + hub_w / 2}" y="{hub_y + 28}" text-anchor="middle" class="mono mu" font-size="12">observability hub</text>')
-    for k, (name, desc, col) in enumerate([("Mimir", "metrics · Prometheus API", t["accent"]),
-                                           ("Loki", "logs", t["warn"]), ("Tempo", "traces", t["accent2"])]):
-        y = hub_y + 46 + k * 70
-        b.append(f'<rect x="{hub_x + 20}" y="{y}" width="{hub_w - 40}" height="56" rx="10" fill="{col}" fill-opacity=".10" stroke="{col}" stroke-opacity=".5"/>')
-        b.append(f'<text x="{hub_x + 40}" y="{y + 25}" class="sans" font-size="17" font-weight="700" fill="{col}">{name}</text>')
-        b.append(f'<text x="{hub_x + 40}" y="{y + 44}" class="mono mu" font-size="11">{desc}</text>')
-    # storage under hub
-    sy = hub_y + hub_h + 22
-    b.append(f'<path d="M{hub_x + hub_w / 2},{hub_y + hub_h} V{sy}" stroke="{t["blue"]}" stroke-width="1.5" class="flow"/>')
-    b.append(f'<rect x="{hub_x + 40}" y="{sy}" width="{hub_w - 80}" height="40" rx="10" fill="{t["blue"]}" fill-opacity=".10" stroke="{t["blue"]}" stroke-opacity=".5"/>')
-    b.append(f'<text x="{hub_x + hub_w / 2}" y="{sy + 25}" text-anchor="middle" class="mono bl" font-size="12.5">Azure Blob · long-term</text>')
-    # right side: grafana + alerting
-    gx = 880
-    for k, (name, desc, col) in enumerate([("Grafana", "dashboards · SLOs", t["warn"]),
-                                           ("Alerting", "routes · on-call", t["err"]),
-                                           ("RCA", "timeline · fix · follow-up", t["ok"])]):
-        y = 96 + k * 92
-        b.append(f'<rect x="{gx}" y="{y}" width="292" height="70" rx="12" class="card2"/>')
-        b.append(f'<rect x="{gx}" y="{y}" width="4" height="70" rx="2" fill="{col}"/>')
-        b.append(f'<text x="{gx + 22}" y="{y + 30}" class="sans tx" font-size="16" font-weight="700">{name}</text>')
-        b.append(f'<text x="{gx + 22}" y="{y + 50}" class="mono mu" font-size="11.5">{desc}</text>')
-        if k:
-            b.append(f'<path d="M{gx + 146},{y - 22} V{y}" stroke="{t["border"]}" stroke-width="1.5" class="flow"/>')
-    path = f"M{hub_x + hub_w},{hub_y + 135} C{hub_x + hub_w + 50},{hub_y + 135} {gx - 50},{131} {gx},{131}"
-    b.append(f'<path d="{path}" fill="none" stroke="{t["border"]}" stroke-width="1.5"/>')
-    b.append(f'<circle r="4" class="ac"><animateMotion dur="1.8s" repeatCount="indefinite" path="{path}"/></circle>')
-    # legend
-    lx = 880
-    for name, col in sig:
-        b.append(f'<circle cx="{lx + 4}" cy="{H - 34}" r="4" fill="{col}"/><text x="{lx + 14}" y="{H - 30}" class="mono mu" font-size="11.5">{name}</text>')
-        lx += len(name) * 7.2 + 34
-    b.append(f'<text x="28" y="{H - 30}" class="mono mu" font-size="11.5">one agent per cluster · one place to look · cheap object storage</text>')
-    return svg(W, H, "".join(b), t, label="Hub-and-spoke observability: Grafana Alloy agents on each AKS cluster ship metrics, logs and traces to a central Mimir, Loki and Tempo hub backed by Azure Blob storage, feeding Grafana dashboards, alerting and RCAs.")
+    W, H = 1200, 730
+    P = 6.0
+    M, LG, TR, SC = t["accent"], t["warn"], t["accent2"], t["err"]
+    b = [defs3d(t), f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="16" class="card"/>', floor(W, H, t),
+         f'<text x="28" y="40" class="mono mu" font-size="13">architecture / <tspan class="tx">multi-cloud-observability-and-self-healing</tspan></text>']
+    lx = W - 28
+    for name, col in reversed([("metrics", M), ("logs", LG), ("traces", TR), ("security", SC)]):
+        lx -= len(name) * 7 + 26
+        b.append(f'<circle cx="{lx + 4}" cy="36" r="4" fill="{col}"/><text x="{lx + 13}" y="40" class="mono mu" font-size="11.5">{name}</text>')
+
+    # sources
+    b.append(f'<text x="30" y="90" class="mono" font-size="11" letter-spacing="1.2"><tspan class="ac" font-weight="700">01</tspan><tspan class="tx" font-weight="700">  WORKLOADS</tspan></text>')
+    srcs = [("azure", "AKS · prod + staging", "Alloy DaemonSet"), ("aws", "EKS", "Alloy · OTel SDK"),
+            ("gcp", "GKE", "Alloy · OTel SDK"), ("digitalocean", "DOKS", "Alloy DaemonSet"),
+            ("wave", "LiveKit SFU", "media nodes · VMs")]
+    sx, sw, sh = 30, 250, 62
+    gate = (396, 318)
+    src_paths = []
+    for i, (ic, name, sub) in enumerate(srcs):
+        y = 112 + i * 80
+        b.append(prism(sx, y, sw, sh, t["accent"], t, 9))
+        b.append(logo(ic, sx + 14, y + 16, 30, t, t["accent"] if ic == "wave" else None))
+        b.append(f'<text x="{sx + 58}" y="{y + 27}" class="sans tx" font-size="14" font-weight="700">{name}</text>')
+        b.append(f'<text x="{sx + 58}" y="{y + 46}" class="mono mu" font-size="10.5">{sub}</text>')
+        for k, col in enumerate((M, LG, TR, SC)):
+            b.append(f'<circle cx="{sx + sw - 18}" cy="{y + 14 + k * 11.5}" r="3" fill="{col}" class="pulse" style="animation-delay:{(i + k) * .3:.1f}s"/>')
+        p = f"M{sx + sw + 9},{y + sh / 2} C{sx + sw + 60},{y + sh / 2} {gate[0] - 50},{gate[1]} {gate[0]},{gate[1]}"
+        src_paths.append(p)
+        b.append(f'<path d="{p}" fill="none" stroke="{t["border"]}" stroke-width="1.6"/>')
+        for k, col in enumerate((M, LG, TR, SC)):
+            if col == SC and i % 2:
+                continue
+            b.append(f'<circle r="3.2" fill="{col}"><animateMotion dur="2.4s" begin="{(i * .37 + k * .6) % 2.4:.2f}s" repeatCount="indefinite" path="{p}"/></circle>')
+    by = 112 + 5 * 80 + 4
+    b.append(f'<rect x="{sx}" y="{by}" width="{sw + 9}" height="96" rx="10" class="card2"/>')
+    for k, line in enumerate(["collected from every cluster",
+                              "node · pod · container CPU + memory",
+                              "restarts · OOMKilled · CPU throttling",
+                              "k8s events · audit · ingress logs",
+                              "OTLP spans · service graph"]):
+        b.append(f'<text x="{sx + 14}" y="{by + 22 + k * 16}" class="mono {"tx" if k == 0 else "mu"}" font-size="{11 if k == 0 else 10.5}"'
+                 f'{" font-weight=" + chr(34) + "700" + chr(34) if k == 0 else ""}>{line}</text>')
+
+    # hub boundary
+    hx, hy, hw, hh = 336, 70, 500, 596
+    b.append(f'<rect x="{hx}" y="{hy}" width="{hw}" height="{hh}" rx="18" fill="{t["accent"]}" fill-opacity=".03" stroke="{t["accent"]}" stroke-opacity=".45" stroke-dasharray="7 6"/>')
+    b.append(f'<text x="{hx + 18}" y="{hy + 24}" class="mono" font-size="11" letter-spacing="1.2"><tspan class="ac" font-weight="700">02</tspan>'
+             f'<tspan class="tx" font-weight="700">  HUB VNET</tspan><tspan class="mu" letter-spacing="0">   private endpoints · peering · RBAC</tspan></text>')
+
+    # gateway
+    gx, gy, gw, gh = gate[0], gate[1] - 40, 118, 80
+    b.append(prism(gx, gy, gw, gh, t["accent"], t, 9))
+    b.append(logo("grafana", gx + 12, gy + 12, 20, t))
+    b.append(f'<text x="{gx + 38}" y="{gy + 27}" class="sans tx" font-size="13.5" font-weight="700">Alloy</text>')
+    b.append(f'<text x="{gx + 12}" y="{gy + 50}" class="mono mu" font-size="10">gateway · OTLP</text>')
+    b.append(f'<text x="{gx + 12}" y="{gy + 65}" class="mono mu" font-size="10">remote_write</text>')
+
+    # LGTM stack as iso slabs, storage underneath
+    cx, a, bb, th = 664, 112, 64.7, 16
+    tiers = [("Mimir", "metrics · WAL", M, 176, "prometheus"), ("Loki", "logs · LogQL", LG, 288, "grafana"),
+             ("Tempo", "traces · OTLP", TR, 400, "opentelemetry")]
+    b.append(f'<line x1="{cx}" y1="176" x2="{cx}" y2="548" stroke="{t["blue"]}" stroke-width="2" class="flow"/>')
+    for name, sub, col, cy, ic in tiers:
+        b.append(slab(cx, cy, a, bb, th, col, t, name, sub, ic))
+        p = f"M{gx + gw + 9},{gate[1]} C{gx + gw + 50},{gate[1]} {cx - a - 40},{cy} {cx - a},{cy}"
+        b.append(f'<path d="{p}" fill="none" stroke="{col}" stroke-opacity=".45" stroke-width="1.6"/>')
+        b.append(f'<circle r="3.6" fill="{col}"><animateMotion dur="1.6s" repeatCount="indefinite" path="{p}"/></circle>')
+        b.append(f'<circle r="3.6" fill="{col}"><animateMotion dur="1.6s" begin=".8s" repeatCount="indefinite" path="{p}"/></circle>')
+    b.append(slab(cx, 548, 124, 71.6, 20, t["blue"], t, "Storage", "Blob · S3 · GCS", "azure"))
+    b.append(f'<path d="M{gx + gw / 2},{gy + gh} V500" stroke="{t["muted"]}" stroke-width="1.4" class="flow"/>')
+    b.append(slab(gx + gw / 2, 520, 50, 28.9, 14, t["muted"], t))
+    b.append(f'<text x="{gx + gw / 2}" y="{586}" text-anchor="middle" class="mono tx" font-size="10.5">PVC · WAL</text>')
+    b.append(f'<text x="{gx + gw / 2}" y="{601}" text-anchor="middle" class="mono mu" font-size="10">gateway buffer</text>')
+    b.append(f'<text x="{hx + 18}" y="{hy + hh - 18}" class="mono mu" font-size="10.5">retention tiers · lifecycle rules · egress via NAT only</text>')
+
+    # alert + response chain
+    rx, rw = 880, 290
+    b.append(f'<text x="{rx}" y="90" class="mono" font-size="11" letter-spacing="1.2"><tspan class="ac" font-weight="700">03</tspan><tspan class="tx" font-weight="700">  DETECT + RESPOND</tspan></text>')
+    chain = [("grafana", "Grafana", "dashboards · SLOs · burn rate", M, 62),
+             ("bell", "Alerting", "multi-window burn-rate rules", LG, 62),
+             ("nat", "NAT gateway", "static egress IP to SaaS", t["muted"], 46),
+             ("pagerduty", "PagerDuty · Slack", "on-call · escalation · runbook", t["ok"], 62),
+             ("heal", "Self-heal", "rollback · HPA/KEDA · restart", t["err"], 62)]
+    y = 112
+    ys_ = []
+    for k, (ic, name, sub, col, hgt) in enumerate(chain):
+        b.append(prism(rx, y, rw, hgt, col, t, 9))
+        b.append(logo(ic, rx + 14, y + (hgt - 22) / 2, 22, t, col if ic in ("bell", "nat", "heal") else None))
+        b.append(f'<text x="{rx + 48}" y="{y + (25 if hgt > 50 else 21)}" class="sans tx" font-size="14" font-weight="700">{name}</text>')
+        b.append(f'<text x="{rx + 48}" y="{y + (44 if hgt > 50 else 36)}" class="mono mu" font-size="10.5">{sub}</text>')
+        if k == 3:
+            b.append(logo("slack", rx + rw - 32, y + 20, 18, t))
+        ys_.append((y, hgt))
+        y += hgt + 18
+    for k in range(len(chain) - 1):
+        y1 = ys_[k][0] + ys_[k][1]
+        y2 = ys_[k + 1][0]
+        b.append(f'<path d="M{rx + rw / 2},{y1} V{y2}" stroke="{t["muted"]}" stroke-width="1.6" class="flow"/>')
+    for name, sub, col, cy, _ in tiers:
+        p = f"M{cx + a},{cy} C{cx + a + 50},{cy} {rx - 50},{143} {rx},{143}"
+        b.append(f'<path d="{p}" fill="none" stroke="{t["border"]}" stroke-width="1.6"/>')
+        b.append(f'<circle r="3.4" fill="{col}"><animateMotion dur="2s" begin="{tiers.index((name, sub, col, cy, _)) * .5}s" repeatCount="indefinite" path="{p}"/></circle>')
+
+    # closed loop back to the workloads
+    last_y = ys_[-1][0] + ys_[-1][1] / 2
+    loop = f"M{rx + rw + 9},{last_y} H{W - 14} V{H - 44} H14 V{112 + 31} H{sx}"
+    b.append(f'<path d="{loop}" fill="none" stroke="{t["ok"]}" stroke-opacity=".7" stroke-width="2" stroke-dasharray="6 6" class="flow"/>')
+    for k in range(3):
+        b.append(f'<circle r="4.5" fill="{t["ok"]}"><animateMotion dur="7s" begin="{k * 2.33:.2f}s" repeatCount="indefinite" path="{loop}"/></circle>')
+    b.append(f'<rect x="{W / 2 - 250}" y="{H - 56}" width="500" height="24" rx="12" fill="{t["card"]}" stroke="{t["ok"]}" stroke-opacity=".6"/>')
+    b.append(f'<text x="{W / 2}" y="{H - 40}" text-anchor="middle" class="mono ok" font-size="11.5">closed loop: detect → page → auto-remediate → verify → RCA</text>')
+
+    # security signals
+    sy = 112 + sum(hgt + 18 for *_, hgt in chain) + 2
+    b.append(f'<rect x="{rx}" y="{sy}" width="{rw + 9}" height="96" rx="10" class="card2"/>')
+    b.append(logo("shield", rx + 14, sy + 10, 16, t, SC))
+    for k, line in enumerate(["security signals", "Kyverno policy reports · Trivy CVEs",
+                              "kube-audit · RBAC + IAM changes", "SOC 2 / ISO 27001 evidence trail"]):
+        b.append(f'<text x="{rx + (38 if k == 0 else 14)}" y="{sy + 23 + k * 19}" class="mono {"tx" if k == 0 else "mu"}" font-size="{11 if k == 0 else 10.5}"'
+                 f'{" font-weight=" + chr(34) + "700" + chr(34) if k == 0 else ""}>{line}</text>')
+    return svg(W, H, "".join(b), t, label=OBS_ALT)
+
+
+OBS_ALT = ("Multi-cloud observability and self-healing. Grafana Alloy on AKS, EKS, GKE, DOKS and LiveKit media nodes ships metrics, "
+           "logs, traces and security events through private endpoints into a hub VNet: an Alloy gateway feeds Mimir, Loki and Tempo, "
+           "backed by object storage and PVC write-ahead logs. Grafana SLO burn-rate alerts route through a NAT gateway to PagerDuty and "
+           "Slack, and self-healing actions (rollback, autoscaling, restarts) close the loop back to the workloads.")
 
 
 # ───────────────────────────── terminal card ─────────────────────────────

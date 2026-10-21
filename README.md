@@ -34,7 +34,7 @@
 <a href="mailto:karthikkpoojar@gmail.com?subject=Hello%20Karthik"><img src="https://img.shields.io/badge/Email-22D3EE?style=for-the-badge&logo=gmail&logoColor=black" alt="Email"/></a>
 <a href="https://www.linkedin.com/in/karthik-9b4211252/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge" alt="LinkedIn"/></a>
 <a href="https://karthik-portfolioo.netlify.app"><img src="https://img.shields.io/badge/Portfolio-000000?style=for-the-badge&logo=netlify&logoColor=white" alt="Portfolio"/></a>
-<a href="https://ieeexplore.ieee.org/abstract/document/11126113"><img src="https://img.shields.io/badge/IEEE%20Access-Q1%20author-00629B?style=for-the-badge&logo=ieee&logoColor=white" alt="IEEE Access Q1 author"/></a>
+<a href="https://scholar.google.com/citations?user=-4aZmCIAAAAJ&hl=en"><img src="https://img.shields.io/badge/Google%20Scholar-4285F4?style=for-the-badge&logo=googlescholar&logoColor=white" alt="Google Scholar"/></a>
 <a href="https://medium.com/@karthik_k_poojary"><img src="https://img.shields.io/badge/Medium-12100E?style=for-the-badge&logo=medium&logoColor=white" alt="Medium"/></a>
 <a href="https://x.com/Karthik_k_umar"><img src="https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white" alt="X"/></a>
 </p>
@@ -106,23 +106,23 @@ I'm a DevOps engineer who likes **boring production**: clusters that heal themse
 </tr>
 </table>
 
-<h2 align="center">How I ship: a self-healing delivery pipeline</h2>
+<h2 align="center">How I ship: enterprise GitOps delivery with self-healing releases</h2>
 
 <a href="https://github.com/Karthik-099/Self-Healing-DevSecOps-Pipeline-for-a-Transaction-Risk-Scoring-Microservice">
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/pipeline-dark.svg">
-  <img alt="Self-healing delivery pipeline: commit, test with SonarQube, Trivy scan, build, Argo CD canary deploy, observe with Prometheus, Loki and Tempo, then promote; an SLO breach triggers automatic rollback." src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/pipeline-light.svg" width="100%">
+  <img alt="Enterprise GitOps delivery pipeline. CI: commit, Gitleaks secret scan, unit tests, SonarQube quality gate, Trivy dependency scan and SBOM, Terraform and Kyverno policy as code, Docker build. Release: Trivy image scan, cosign signing and push to Docker Hub, ECR or ACR, config repo bumped to the image digest, Argo CD pull-based sync, Kyverno admission, Argo Rollouts canary, production on AKS, EKS, GKE or DOKS. Verify: Prometheus, Loki and Tempo feed an SLO analysis that promotes the release or rolls it back automatically, pages PagerDuty and reverts the config repo." src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/pipeline-light.svg" width="100%">
 </picture>
 </a>
 
-<h2 align="center">How I wire observability across clusters</h2>
+<h2 align="center">How I see production: multi-cloud observability that closes the loop</h2>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/observability-dark.svg">
-  <img alt="Hub-and-spoke observability: Grafana Alloy agents on each AKS cluster ship metrics, logs and traces to a central Mimir, Loki and Tempo hub backed by Azure Blob storage, feeding Grafana dashboards, alerting and RCAs." src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/observability-light.svg" width="100%">
+  <img alt="Multi-cloud observability and self-healing. Grafana Alloy on AKS, EKS, GKE, DOKS and LiveKit media nodes ships metrics, logs, traces and security events through private endpoints into a hub VNet: an Alloy gateway feeds Mimir, Loki and Tempo, backed by object storage and PVC write-ahead logs. Grafana SLO burn-rate alerts route through a NAT gateway to PagerDuty and Slack, and self-healing actions (rollback, autoscaling, restarts) close the loop back to the workloads." src="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/observability-light.svg" width="100%">
 </picture>
 
-<p align="center"><sub>The pattern behind the stack I run at work: one Alloy agent per cluster, one place to look, and a <b>35% gain in collection efficiency</b>.</sub></p>
+<p align="center"><sub>The pattern behind the stack I run at work: one Alloy agent per cluster, one place to look, SLO-driven paging, and a <b>35% gain in collection efficiency</b>.</sub></p>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Karthik-099/Karthik-099/main/assets/divider-dark.svg">
